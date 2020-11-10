@@ -1,28 +1,56 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="header">
+      <h1>Chatroom</h1>
+      <p class="username">Username: {{ username }}</p>
+      <p class="online"> Users Online: {{ users.length }}</p>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import io from 'socket.io-client'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  components: {},
+  data: function() {
+    return {
+      username: "",
+      socket: io('http://localhost:3366'),
+      messages: [],
+      users: []
+    }
+  },
+  methods: {
+    joinServer() {
+      this.socket.on('loggedIn', data => {
+        this.messages = data.messages
+        this.users = data.users
+        this.socket.emit('newUser', this.username)
+      })
+    }
+  },
+  mounted() {
+    this.username = 'Uzlash'
+    this.joinServer()
   }
 }
 </script>
 
 <style>
-#app {
+body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin: 0;
+  padding: 0;
+}
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
 }
 </style>
